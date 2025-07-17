@@ -13,12 +13,9 @@ export interface Payable {
 
 export interface Purchase {
   id: string;
-  notes: string;
-  summary?: string;
-  category?: string;
-  quantity?: number;
-  price?: number;
-  dealerContactInfo?: string;
+  summary: string;
+  quantity: number;
+  dealerContactInfo: string;
 }
 
 export interface DealerContact {

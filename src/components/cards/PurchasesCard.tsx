@@ -5,7 +5,6 @@ import type { Purchase } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { ShoppingCart, PlusCircle, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -17,12 +16,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 
 const purchaseSchema = z.object({
-  notes: z.string().min(1, 'Please provide notes about the purchase.'),
-  summary: z.string().optional(),
-  category: z.string().optional(),
-  quantity: z.coerce.number().optional(),
-  price: z.coerce.number().optional(),
-  dealerContactInfo: z.string().optional(),
+  summary: z.string().min(1, 'Product name is required.'),
+  quantity: z.coerce.number().min(1, 'Quantity must be at least 1.'),
+  dealerContactInfo: z.string().min(1, 'Dealer name is required.'),
 });
 
 type PurchasesCardProps = {
@@ -38,23 +34,17 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
   const form = useForm<z.infer<typeof purchaseSchema>>({
     resolver: zodResolver(purchaseSchema),
     defaultValues: {
-      notes: '',
       summary: '',
-      category: '',
-      quantity: 0,
-      price: 0,
+      quantity: 1,
       dealerContactInfo: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof purchaseSchema>) {
     const formData = new FormData();
-    formData.append('notes', values.notes);
-    if(values.summary) formData.append('summary', values.summary);
-    if(values.category) formData.append('category', values.category);
-    if(values.quantity) formData.append('quantity', String(values.quantity));
-    if(values.price) formData.append('price', String(values.price));
-    if(values.dealerContactInfo) formData.append('dealerContactInfo', values.dealerContactInfo);
+    formData.append('summary', values.summary);
+    formData.append('quantity', String(values.quantity));
+    formData.append('dealerContactInfo', values.dealerContactInfo);
 
     startTransition(async () => {
       const result = await createPurchase(formData);
@@ -101,35 +91,9 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
                   name="summary"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Summary</FormLabel>
+                      <FormLabel>Product Name</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., Fine talc powder" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Enter any details..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Raw Materials" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -150,25 +114,12 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
                 />
                 <FormField
                   control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Total Price</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="e.g., 500" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="dealerContactInfo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Dealer Contact Info</FormLabel>
+                      <FormLabel>Dealer Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 555-123-4567" {...field} />
+                        <Input placeholder="e.g., Talc Co." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -192,11 +143,8 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
             purchases.map(item => (
               <div key={item.id} className="p-4 rounded-lg border bg-card-foreground/5">
                 <p className="font-semibold text-sm">{item.summary || 'Purchase'}</p>
-                <p className="text-xs text-muted-foreground mb-2">{item.notes}</p>
-                <div className="flex flex-wrap gap-2 text-xs">
-                    {item.category && <Badge variant="secondary">Category: {item.category}</Badge>}
+                <div className="flex flex-wrap gap-2 text-xs mt-2">
                     {item.quantity && <Badge variant="secondary">Quantity: {item.quantity}</Badge>}
-                    {item.price && <Badge variant="secondary">Price: ${item.price.toFixed(2)}</Badge>}
                     {item.dealerContactInfo && <Badge>Dealer: {item.dealerContactInfo}</Badge>}
                 </div>
               </div>
