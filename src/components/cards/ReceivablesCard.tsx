@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, PlusCircle } from 'lucide-react';
+import { TrendingUp, PlusCircle, CheckCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,9 +22,10 @@ const receivableSchema = z.object({
 type ReceivablesCardProps = {
   receivables: Receivable[];
   onAddReceivable: (receivable: Omit<Receivable, 'id'>) => void;
+  onClearReceivable: (id: string) => void;
 };
 
-export default function ReceivablesCard({ receivables, onAddReceivable }: ReceivablesCardProps) {
+export default function ReceivablesCard({ receivables, onAddReceivable, onClearReceivable }: ReceivablesCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   const form = useForm<z.infer<typeof receivableSchema>>({
@@ -104,6 +105,7 @@ export default function ReceivablesCard({ receivables, onAddReceivable }: Receiv
                 <TableRow>
                   <TableHead>Payer</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -111,13 +113,18 @@ export default function ReceivablesCard({ receivables, onAddReceivable }: Receiv
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.payer}</TableCell>
                     <TableCell className="text-right">${item.amount.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => onClearReceivable(item.id)} title="Clear Receivable">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              No receivables yet.
+              No outstanding receivables.
             </div>
           )}
         </div>

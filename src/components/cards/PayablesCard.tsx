@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingDown, PlusCircle, CalendarIcon } from 'lucide-react';
+import { TrendingDown, PlusCircle, CalendarIcon, CheckCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -26,9 +26,10 @@ const payableSchema = z.object({
 type PayablesCardProps = {
   payables: Payable[];
   onAddPayable: (payable: Omit<Payable, 'id'>) => void;
+  onClearPayable: (id: string) => void;
 };
 
-export default function PayablesCard({ payables, onAddPayable }: PayablesCardProps) {
+export default function PayablesCard({ payables, onAddPayable, onClearPayable }: PayablesCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   const form = useForm<z.infer<typeof payableSchema>>({
@@ -150,6 +151,7 @@ export default function PayablesCard({ payables, onAddPayable }: PayablesCardPro
                   <TableHead>Payee</TableHead>
                   <TableHead>Due Date</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -158,13 +160,18 @@ export default function PayablesCard({ payables, onAddPayable }: PayablesCardPro
                     <TableCell className="font-medium">{item.payee}</TableCell>
                     <TableCell>{format(item.dueDate, "MMM d, yyyy")}</TableCell>
                     <TableCell className="text-right">${item.amount.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => onClearPayable(item.id)} title="Clear Payable">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              No payables yet.
+              No outstanding payables.
             </div>
           )}
         </div>

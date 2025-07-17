@@ -7,6 +7,7 @@ import PayablesCard from '@/components/cards/PayablesCard';
 import PurchasesCard from '@/components/cards/PurchasesCard';
 import DealerContactsCard from '@/components/cards/DealerContactsCard';
 import FinancialSummaryCard from '@/components/cards/FinancialSummaryCard';
+import HistoryCard from '@/components/cards/HistoryCard';
 import type { Receivable, Payable, Purchase, DealerContact } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast"
 
@@ -24,15 +25,36 @@ export default function Home() {
   const [dealerContacts, setDealerContacts] = useState<DealerContact[]>([
     { id: '1', name: 'Perfume Dealer A', contactInfo: 'contact@dealera.com' },
   ]);
+  const [historicalReceivables, setHistoricalReceivables] = useState<Receivable[]>([]);
+  const [historicalPayables, setHistoricalPayables] = useState<Payable[]>([]);
+
 
   const handleAddReceivable = (receivable: Omit<Receivable, 'id'>) => {
     setReceivables(prev => [...prev, { ...receivable, id: crypto.randomUUID() }]);
     toast({ title: "Success", description: "Receivable added." });
   };
 
+  const handleClearReceivable = (id: string) => {
+    const itemToMove = receivables.find(r => r.id === id);
+    if (itemToMove) {
+      setHistoricalReceivables(prev => [itemToMove, ...prev]);
+      setReceivables(prev => prev.filter(r => r.id !== id));
+      toast({ title: "Success", description: "Receivable cleared." });
+    }
+  };
+
   const handleAddPayable = (payable: Omit<Payable, 'id'>) => {
     setPayables(prev => [...prev, { ...payable, id: crypto.randomUUID() }]);
     toast({ title: "Success", description: "Payable added." });
+  };
+
+  const handleClearPayable = (id: string) => {
+    const itemToMove = payables.find(p => p.id === id);
+    if (itemToMove) {
+      setHistoricalPayables(prev => [itemToMove, ...prev]);
+      setPayables(prev => prev.filter(p => p.id !== id));
+      toast({ title: "Success", description: "Payable cleared." });
+    }
   };
 
   const handleAddPurchase = (purchase: Purchase) => {
@@ -53,13 +75,16 @@ export default function Home() {
                 <div className="xl:col-span-2">
                     <FinancialSummaryCard receivables={receivables} payables={payables} purchases={purchases} />
                 </div>
-                <ReceivablesCard receivables={receivables} onAddReceivable={handleAddReceivable} />
-                <PayablesCard payables={payables} onAddPayable={handleAddPayable} />
+                <ReceivablesCard receivables={receivables} onAddReceivable={handleAddReceivable} onClearReceivable={handleClearReceivable} />
+                <PayablesCard payables={payables} onAddPayable={handleAddPayable} onClearPayable={handleClearPayable} />
                 <div className="xl:col-span-2">
                     <PurchasesCard purchases={purchases} onAddPurchase={handleAddPurchase} />
                 </div>
                 <div className="xl:col-span-2">
                     <DealerContactsCard dealerContacts={dealerContacts} onAddDealerContact={handleAddDealerContact} />
+                </div>
+                <div className="xl:col-span-2">
+                  <HistoryCard clearedReceivables={historicalReceivables} clearedPayables={historicalPayables} />
                 </div>
             </div>
         </div>
