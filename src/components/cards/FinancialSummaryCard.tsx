@@ -50,7 +50,7 @@ export default function FinancialSummaryCard({ receivables, payables, purchases 
   };
 
   return (
-    <Card className="bg-gradient-to-br from-primary/30 to-background">
+    <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div className='flex items-center gap-2'>
           <Sparkles className="text-accent h-6 w-6" />
