@@ -1,4 +1,5 @@
 import { TalcTrackLogo } from './TalcTrackLogo';
+import { ThemeToggle } from './ThemeToggle';
 
 export default function Header() {
   return (
@@ -8,6 +9,9 @@ export default function Header() {
         <h1 className="text-2xl font-headline font-bold text-foreground">
           TalcTrack
         </h1>
+        <div className="ml-auto">
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
