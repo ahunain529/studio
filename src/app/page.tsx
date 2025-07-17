@@ -118,8 +118,8 @@ export default function Home() {
                 <div className="xl:col-span-2">
                     <FinancialOverviewCard receivables={receivables} payables={payables} />
                 </div>
-                <ReceivablesCard receivables={receivables} onAddReceivable={handleAddReceivable} onClearReceivable={handleClearReceivable} />
-                <PayablesCard payables={payables} onAddPayable={handleAddPayable} onClearPayable={handleClearPayable} />
+                <ReceivablesCard receivables={receivables} onAddReceivable={handleAddReceivable} onClearReceivable={handleClearReceivable} dealerContacts={dealerContacts} />
+                <PayablesCard payables={payables} onAddPayable={handleAddPayable} onClearPayable={handleClearPayable} dealerContacts={dealerContacts} />
                 <div className="xl:col-span-2">
                     <PurchasesCard purchases={purchases} onAddPurchase={handleAddPurchase} />
                 </div>

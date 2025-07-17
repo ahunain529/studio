@@ -1,18 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import type { Receivable } from '@/lib/types';
+import type { Receivable, DealerContact } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TrendingUp, PlusCircle, CheckCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const receivableSchema = z.object({
   payer: z.string().min(1, 'Payer name is required'),
@@ -23,9 +23,10 @@ type ReceivablesCardProps = {
   receivables: Receivable[];
   onAddReceivable: (receivable: Omit<Receivable, 'id'>) => void;
   onClearReceivable: (id: string) => void;
+  dealerContacts: DealerContact[];
 };
 
-export default function ReceivablesCard({ receivables, onAddReceivable, onClearReceivable }: ReceivablesCardProps) {
+export default function ReceivablesCard({ receivables, onAddReceivable, onClearReceivable, dealerContacts }: ReceivablesCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   const form = useForm<z.infer<typeof receivableSchema>>({
@@ -68,9 +69,18 @@ export default function ReceivablesCard({ receivables, onAddReceivable, onClearR
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Payer</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Customer A" {...field} />
-                      </FormControl>
+                       <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a contact" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {dealerContacts.map(contact => (
+                            <SelectItem key={contact.id} value={contact.name}>{contact.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
