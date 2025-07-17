@@ -62,7 +62,7 @@ export default function PayablesCard({ payables, onAddPayable, onClearPayable, d
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className='gap-2'><PlusCircle size={16}/> Add New</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="w-[90vw] max-w-md rounded-md">
             <DialogHeader>
               <DialogTitle>Add New Payable</DialogTitle>
               <DialogDescription>Enter the details of the outgoing payment.</DialogDescription>

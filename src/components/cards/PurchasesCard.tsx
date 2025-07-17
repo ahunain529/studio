@@ -77,7 +77,7 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className='gap-2'><PlusCircle size={16}/> Add Purchase</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="w-[90vw] max-w-md rounded-md">
             <DialogHeader>
               <DialogTitle>Add Purchase</DialogTitle>
               <DialogDescription>

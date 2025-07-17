@@ -56,7 +56,7 @@ export default function ReceivablesCard({ receivables, onAddReceivable, onClearR
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className='gap-2'><PlusCircle size={16}/> Add New</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="w-[90vw] max-w-md rounded-md">
             <DialogHeader>
               <DialogTitle>Add New Receivable</DialogTitle>
               <DialogDescription>Enter the details of the incoming payment.</DialogDescription>

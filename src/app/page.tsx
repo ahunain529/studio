@@ -114,19 +114,19 @@ export default function Home() {
       <Header />
       <main className="flex-1 p-4 md:p-6 lg:p-8">
         <div className="container mx-auto">
-            <div className="grid gap-6 grid-cols-1 xl:grid-cols-2">
-                <div className="xl:col-span-2">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+                <div className="lg:col-span-2">
                     <FinancialOverviewCard receivables={receivables} payables={payables} />
                 </div>
                 <ReceivablesCard receivables={receivables} onAddReceivable={handleAddReceivable} onClearReceivable={handleClearReceivable} dealerContacts={dealerContacts} />
                 <PayablesCard payables={payables} onAddPayable={handleAddPayable} onClearPayable={handleClearPayable} dealerContacts={dealerContacts} />
-                <div className="xl:col-span-2">
+                <div className="lg:col-span-2">
                     <PurchasesCard purchases={purchases} onAddPurchase={handleAddPurchase} />
                 </div>
-                <div className="xl:col-span-2">
+                <div className="lg:col-span-2">
                     <DealerContactsCard dealerContacts={dealerContacts} onAddDealerContact={handleAddDealerContact} />
                 </div>
-                <div className="xl:col-span-2">
+                <div className="lg:col-span-2">
                   <HistoryCard clearedReceivables={historicalReceivables} clearedPayables={historicalPayables} />
                 </div>
             </div>

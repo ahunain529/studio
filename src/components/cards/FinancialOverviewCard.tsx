@@ -24,7 +24,7 @@ export default function FinancialOverviewCard({ receivables, payables }: Financi
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
             <div className="p-4 rounded-lg bg-card-foreground/5">
                 <div className='flex items-center justify-center gap-2 mb-2'>
                     <TrendingUp className="text-green-500" />
@@ -40,7 +40,10 @@ export default function FinancialOverviewCard({ receivables, payables }: Financi
                 <p className="text-2xl font-bold">${totalPayables.toFixed(2)}</p>
             </div>
             <div className="p-4 rounded-lg bg-card-foreground/5">
-                <h3 className="text-sm font-semibold text-muted-foreground mb-2">Net Balance</h3>
+                <div className='flex items-center justify-center gap-2 mb-2'>
+                  <Scale className="text-blue-500" />
+                  <h3 className="text-sm font-semibold text-muted-foreground">Net Balance</h3>
+                </div>
                 <p className={cn(
                     "text-2xl font-bold",
                     netBalance >= 0 ? "text-green-500" : "text-red-500"

@@ -13,6 +13,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+
 
 const contactSchema = z.object({
   name: z.string().min(1, 'Dealer name is required'),
@@ -27,6 +30,7 @@ type DealerContactsCardProps = {
 export default function DealerContactsCard({ dealerContacts, onAddDealerContact }: DealerContactsCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const form = useForm<z.infer<typeof contactSchema>>({
     resolver: zodResolver(contactSchema),
@@ -97,18 +101,26 @@ export default function DealerContactsCard({ dealerContacts, onAddDealerContact 
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between space-x-2">
         <div className='flex items-center gap-2'>
           <Users className="text-accent h-6 w-6" />
-          <CardTitle className="font-headline">Dealer Contacts</CardTitle>
+          <CardTitle className="font-headline text-xl md:text-2xl">Dealer Contacts</CardTitle>
         </div>
-        <div className="flex gap-2">
-           <Button variant="outline" size="sm" className='gap-2' onClick={handleSyncContacts}><Import size={16}/> Sync from Phone</Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+           <Button variant={isMobile ? 'default' : 'outline'} size="sm" className='gap-2' onClick={handleSyncContacts}>
+             <Import size={16}/> 
+             <span className={cn(isMobile && 'hidden', 'sm:inline')}>Sync</span>
+             <span className={cn(!isMobile && 'hidden', 'sm:hidden')}>Sync from Phone</span>
+           </Button>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className='gap-2'><PlusCircle size={16}/> Add Contact</Button>
+              <Button variant="outline" size="sm" className='gap-2'>
+                <PlusCircle size={16}/>
+                <span>Add</span>
+                <span className="hidden sm:inline">Contact</span>
+              </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="w-[90vw] max-w-md rounded-md">
               <DialogHeader>
                 <DialogTitle>Add New Dealer Contact</DialogTitle>
                 <DialogDescription>Enter the dealer's information.</DialogDescription>
