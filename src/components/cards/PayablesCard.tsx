@@ -75,15 +75,13 @@ export default function PayablesCard({ payables, onAddPayable, onClearPayable, d
                     <FormItem>
                       <FormLabel>Payee</FormLabel>
                        <FormControl>
-                        <>
-                          <Input list="dealer-contacts-list" placeholder="Select or type a payee" {...field} />
-                           <datalist id="dealer-contacts-list">
-                            {dealerContacts.map(contact => (
-                              <option key={contact.id} value={contact.name} />
-                            ))}
-                          </datalist>
-                        </>
+                        <Input list="payable-dealer-contacts-list" placeholder="Select or type a payee" {...field} />
                       </FormControl>
+                      <datalist id="payable-dealer-contacts-list">
+                        {dealerContacts.map(contact => (
+                          <option key={contact.id} value={contact.name} />
+                        ))}
+                      </datalist>
                       <FormMessage />
                     </FormItem>
                   )}

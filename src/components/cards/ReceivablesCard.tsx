@@ -69,15 +69,13 @@ export default function ReceivablesCard({ receivables, onAddReceivable, onClearR
                     <FormItem>
                       <FormLabel>Payer</FormLabel>
                        <FormControl>
-                        <>
-                          <Input list="dealer-contacts-list" placeholder="Select or type a payer" {...field} />
-                           <datalist id="dealer-contacts-list">
-                            {dealerContacts.map(contact => (
-                              <option key={contact.id} value={contact.name} />
-                            ))}
-                          </datalist>
-                        </>
-                      </FormControl>
+                        <Input list="receivable-dealer-contacts-list" placeholder="Select or type a payer" {...field} />
+                       </FormControl>
+                       <datalist id="receivable-dealer-contacts-list">
+                        {dealerContacts.map(contact => (
+                          <option key={contact.id} value={contact.name} />
+                        ))}
+                      </datalist>
                       <FormMessage />
                     </FormItem>
                   )}
