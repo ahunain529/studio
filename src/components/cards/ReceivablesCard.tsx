@@ -12,7 +12,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const receivableSchema = z.object({
   payer: z.string().min(1, 'Payer name is required'),
@@ -69,18 +68,16 @@ export default function ReceivablesCard({ receivables, onAddReceivable, onClearR
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Payer</FormLabel>
-                       <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a contact" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {dealerContacts.map(contact => (
-                            <SelectItem key={contact.id} value={contact.name}>{contact.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                       <FormControl>
+                        <>
+                          <Input list="dealer-contacts-list" placeholder="Select or type a payer" {...field} />
+                           <datalist id="dealer-contacts-list">
+                            {dealerContacts.map(contact => (
+                              <option key={contact.id} value={contact.name} />
+                            ))}
+                          </datalist>
+                        </>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
