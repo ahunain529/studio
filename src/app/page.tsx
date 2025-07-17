@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import ReceivablesCard from '@/components/cards/ReceivablesCard';
 import PayablesCard from '@/components/cards/PayablesCard';
@@ -10,23 +10,56 @@ import FinancialSummaryCard from '@/components/cards/FinancialSummaryCard';
 import HistoryCard from '@/components/cards/HistoryCard';
 import type { Receivable, Payable, Purchase, DealerContact } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast"
+import { database } from '@/lib/firebase';
+import { ref, onValue, set } from 'firebase/database';
+import { Loader2 } from 'lucide-react';
 
 export default function Home() {
   const { toast } = useToast();
-  const [receivables, setReceivables] = useState<Receivable[]>([
-    { id: '1', payer: 'Customer A', amount: 1500 },
-    { id: '2', payer: 'Customer B', amount: 800 },
-  ]);
-  const [payables, setPayables] = useState<Payable[]>([
-    { id: '1', payee: 'Supplier X', amount: 2000, dueDate: new Date() },
-    { id: '2', payee: 'Supplier Y', amount: 1200, dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
-  ]);
+  const [receivables, setReceivables] = useState<Receivable[]>([]);
+  const [payables, setPayables] = useState<Payable[]>([]);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [dealerContacts, setDealerContacts] = useState<DealerContact[]>([
-    { id: '1', name: 'Perfume Dealer A', contactInfo: 'contact@dealera.com' },
-  ]);
+  const [dealerContacts, setDealerContacts] = useState<DealerContact[]>([]);
   const [historicalReceivables, setHistoricalReceivables] = useState<Receivable[]>([]);
   const [historicalPayables, setHistoricalPayables] = useState<Payable[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Effect to fetch initial data from Firebase
+  useEffect(() => {
+    const dataRef = ref(database);
+    const unsubscribe = onValue(dataRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setReceivables(data.receivables || []);
+        setPayables((data.payables || []).map((p: any) => ({ ...p, dueDate: new Date(p.dueDate) })));
+        setPurchases(data.purchases || []);
+        setDealerContacts(data.dealerContacts || []);
+        setHistoricalReceivables(data.historicalReceivables || []);
+        setHistoricalPayables((data.historicalPayables || []).map((p: any) => ({ ...p, dueDate: new Date(p.dueDate) })));
+      }
+      setIsLoading(false);
+    }, (error) => {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch data from the database.'});
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [toast]);
+
+  // Effect to sync state changes back to Firebase
+  useEffect(() => {
+    if (isLoading) return; // Don't write back to DB on initial load
+    const dataToSave = {
+        receivables,
+        payables: payables.map(p => ({...p, dueDate: p.dueDate.toISOString()})),
+        purchases,
+        dealerContacts,
+        historicalReceivables,
+        historicalPayables: historicalPayables.map(p => ({...p, dueDate: p.dueDate.toISOString()})),
+    };
+    set(ref(database), dataToSave);
+  }, [receivables, payables, purchases, dealerContacts, historicalReceivables, historicalPayables, isLoading]);
 
 
   const handleAddReceivable = (receivable: Omit<Receivable, 'id'>) => {
@@ -65,6 +98,15 @@ export default function Home() {
     setDealerContacts(prev => [...prev, { ...contact, id: crypto.randomUUID() }]);
     toast({ title: "Success", description: "Dealer contact added." });
   };
+
+  if (isLoading) {
+      return (
+          <div className="flex flex-col min-h-screen bg-background text-foreground items-center justify-center">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+              <p className="mt-4 text-muted-foreground">Loading financial data...</p>
+          </div>
+      )
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
