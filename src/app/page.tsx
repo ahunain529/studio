@@ -6,7 +6,7 @@ import ReceivablesCard from '@/components/cards/ReceivablesCard';
 import PayablesCard from '@/components/cards/PayablesCard';
 import PurchasesCard from '@/components/cards/PurchasesCard';
 import DealerContactsCard from '@/components/cards/DealerContactsCard';
-import FinancialSummaryCard from '@/components/cards/FinancialSummaryCard';
+import FinancialOverviewCard from '@/components/cards/FinancialOverviewCard';
 import HistoryCard from '@/components/cards/HistoryCard';
 import type { Receivable, Payable, Purchase, DealerContact } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast"
@@ -90,8 +90,9 @@ export default function Home() {
     }
   };
 
-  const handleAddPurchase = (purchase: Purchase) => {
-    setPurchases(prev => [purchase, ...prev]);
+  const handleAddPurchase = (purchase: Omit<Purchase, 'id'>) => {
+    setPurchases(prev => [{...purchase, id: crypto.randomUUID()}, ...prev]);
+    toast({ title: "Success", description: "Purchase added." });
   };
 
   const handleAddDealerContact = (contact: Omit<DealerContact, 'id'>) => {
@@ -115,7 +116,7 @@ export default function Home() {
         <div className="container mx-auto">
             <div className="grid gap-6 grid-cols-1 xl:grid-cols-2">
                 <div className="xl:col-span-2">
-                    <FinancialSummaryCard receivables={receivables} payables={payables} purchases={purchases} />
+                    <FinancialOverviewCard receivables={receivables} payables={payables} />
                 </div>
                 <ReceivablesCard receivables={receivables} onAddReceivable={handleAddReceivable} onClearReceivable={handleClearReceivable} />
                 <PayablesCard payables={payables} onAddPayable={handleAddPayable} onClearPayable={handleClearPayable} />

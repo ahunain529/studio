@@ -3,9 +3,10 @@
 import { useState, useTransition } from 'react';
 import type { Purchase } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { ShoppingCart, PlusCircle, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,12 +17,17 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 
 const purchaseSchema = z.object({
-  notes: z.string().min(10, 'Please provide detailed notes about the purchase.'),
+  notes: z.string().min(1, 'Please provide notes about the purchase.'),
+  summary: z.string().optional(),
+  category: z.string().optional(),
+  quantity: z.coerce.number().optional(),
+  price: z.coerce.number().optional(),
+  dealerContactInfo: z.string().optional(),
 });
 
 type PurchasesCardProps = {
   purchases: Purchase[];
-  onAddPurchase: (purchase: Purchase) => void;
+  onAddPurchase: (purchase: Omit<Purchase, 'id'>) => void;
 };
 
 export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCardProps) {
@@ -33,12 +39,22 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
     resolver: zodResolver(purchaseSchema),
     defaultValues: {
       notes: '',
+      summary: '',
+      category: '',
+      quantity: 0,
+      price: 0,
+      dealerContactInfo: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof purchaseSchema>) {
     const formData = new FormData();
     formData.append('notes', values.notes);
+    if(values.summary) formData.append('summary', values.summary);
+    if(values.category) formData.append('category', values.category);
+    if(values.quantity) formData.append('quantity', String(values.quantity));
+    if(values.price) formData.append('price', String(values.price));
+    if(values.dealerContactInfo) formData.append('dealerContactInfo', values.dealerContactInfo);
 
     startTransition(async () => {
       const result = await createPurchase(formData);
@@ -51,8 +67,8 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
       } else {
         onAddPurchase(result);
         toast({
-          title: 'Purchase Analyzed',
-          description: 'AI has successfully processed your purchase notes.',
+          title: 'Purchase Added',
+          description: 'Your purchase has been recorded.',
         });
         form.reset();
         setIsOpen(false);
@@ -71,24 +87,88 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className='gap-2'><PlusCircle size={16}/> Add Purchase</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Add and Analyze Purchase</DialogTitle>
+              <DialogTitle>Add Purchase</DialogTitle>
               <DialogDescription>
-                Describe your purchase in the notes below. Our AI will automatically analyze and categorize it.
-                e.g., "Bought 100kg of super-fine talc powder for $500 from Dealer B. Their contact is 555-123-4567. Got a 5% discount."
+                Enter the details of your purchase below.
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
                 <FormField
+                  control={form.control}
+                  name="summary"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Summary</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Fine talc powder" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
                   control={form.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Purchase Notes</FormLabel>
+                      <FormLabel>Notes</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Enter all details about your purchase..." {...field} rows={5} />
+                        <Textarea placeholder="Enter any details..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Raw Materials" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantity</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="e.g., 100" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Total Price</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="e.g., 500" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dealerContactInfo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dealer Contact Info</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 555-123-4567" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -98,7 +178,7 @@ export default function PurchasesCard({ purchases, onAddPurchase }: PurchasesCar
                   <DialogClose asChild><Button variant="ghost" disabled={isPending}>Cancel</Button></DialogClose>
                   <Button type="submit" disabled={isPending}>
                     {isPending ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
-                    Analyze and Add
+                    Add Purchase
                   </Button>
                 </DialogFooter>
               </form>
